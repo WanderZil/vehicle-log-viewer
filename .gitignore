@@ -1,0 +1,44 @@
+# Dependencies & envs
+node_modules/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# Build / tooling
+.output/
+.tanstack/
+.wrangler/
+dist/
+.vite/
+*.local
+
+# Cloudflare working copy (template is wrangler.example.jsonc)
+wrangler.jsonc
+wrangler.toml
+
+# Local data & runtime artifacts
+data/
+*.db
+*.db-*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Playwright / MCP debug dumps
+.playwright-mcp/
+
+# Generated i18n output (rebuilt by vite plugin)
+src/paraglide/
+
+# Logs & coverage
+logs/
+*.log
+coverage/
+.nyc_output/
