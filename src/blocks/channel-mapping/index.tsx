@@ -150,7 +150,7 @@ export function ChannelMappingBlock({
             {busy
               ? m['analyses.auto_parsing']()
               : mappedCount > 0
-                ? m['analyses.mapping_save_parse']()
+                ? m['analyses.setup_start']()
                 : m['analyses.mapping_save']()}
           </Button>
         </div>

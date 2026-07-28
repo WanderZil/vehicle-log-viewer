@@ -5,19 +5,21 @@ Vehicle Log Viewer is a browser-based CAN log analyzer for **loading raw bus log
 ## Workflow
 
 ```text
-Load log  →  Load DBC  →  Channel mapping  →  Parse  →  Graph / Trace / DBC
+Load log  →  Load DBC  →  Channel mapping (+ Start)  →  Graph / Trace / DBC
 ```
 
 Typical session:
 
 1. **File → Load CAN log…** — load `BLF`, `ASC`, `CSV`, `LOG`, or `MF4`
 2. **File → Load DBC…** — add one or more `.dbc` files
-3. **File → Channel mapping…** — assign DBC files to one or more CAN channels
-4. **File → Parse signals** — decode matching messages into signal series
-5. Switch between **Graph**, **Trace**, and **DBC**
+3. **File → Channel mapping…** — assign DBC files to CAN channels, then click **Start parsing** on the mapping card
+4. Switch between **Graph**, **Trace**, and **DBC**
+
+You do **not** need a separate **File → Parse signals** step after mapping; **Start parsing** on the card begins decode.
 
 Optional actions:
 
+- **File → Parse signals** — re-run decode later if needed
 - **File → Export signals (CSV)…**
 - **File → Save project…**
 - **File → Import project…**
@@ -538,7 +540,7 @@ To restore a project:
 
 1. import the project file
 2. reload the referenced log and DBC files
-3. parse again
+3. open Channel Mapping and click **Start parsing** again (or **File → Parse signals**)
 
 ## Privacy
 

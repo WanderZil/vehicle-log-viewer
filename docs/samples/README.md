@@ -15,9 +15,8 @@ Synthetic **J1939-style** log + DBC with **varying** RPM / speed / pedal — rea
 1. **File → Load CAN log…** → `j1939-demo.asc` *(or `.blf`)*
 2. **File → Load DBC…** → `j1939-demo.dbc`
 3. **File → Channel mapping…** → assign the DBC to **channel 1**  
-   *(or use “apply all DBCs to all channels”)*
-4. **File → Parse signals**
-5. Open **View → Graph** — signals should appear (first signal is auto-added; click **+** for more)  
+   *(or use “apply all DBCs to all channels”)*, then click **Start parsing** on the mapping card
+4. Open **View → Graph** — signals should appear (first signal is auto-added; click **+** for more)  
    **View → Trace** — frame table  
    **View → DBC** — message / bit layout (works after DBC load even without parse)
 

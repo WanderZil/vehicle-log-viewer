@@ -80,9 +80,8 @@ Open [http://localhost:3000](http://localhost:3000).
 
 1. **File → Load CAN log…**
 2. **File → Load DBC…**
-3. **File → Channel mapping…**
-4. **File → Parse signals**
-5. **View → Graph** / **Trace** / **DBC**
+3. **File → Channel mapping…** — assign DBC(s) to channels, then click **Start parsing** on the mapping card
+4. **View → Graph** / **Trace** / **DBC**
 
 Details: [docs/guide.md](./docs/guide.md)
 

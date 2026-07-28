@@ -245,12 +245,13 @@ The layout is optimized for fast inspection:
 
 ### Parsing
 
-1. User maps DBC files to channels
-2. `decodeLogWithDbcs()` iterates log frames again
-3. Matching frame IDs are decoded into signal values
-4. A signal catalog + point arrays are built
-5. Trace rows are annotated with frame/message names
-6. Graph becomes ready and auto-adds the first signal when appropriate
+1. User maps DBC files to channels on the Channel Mapping card
+2. Clicking **Start parsing** on that card applies the mapping and starts decode (no separate menu step required)
+3. `decodeLogWithDbcs()` iterates log frames again
+4. Matching frame IDs are decoded into signal values
+5. A signal catalog + point arrays are built
+6. Trace rows are annotated with frame/message names
+7. Graph becomes ready and auto-adds the first signal when appropriate
 
 ## Deployment model
 

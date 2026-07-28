@@ -17,7 +17,7 @@
 | File | Suggested content |
 |------|-------------------|
 | `channel-mapping.png` | **File → Channel mapping** dialog |
-| `workflow.png` | Full window after **File → Parse** (toolbar + filename visible) |
+| `workflow.png` | Full window after Channel Mapping **Start parsing** (toolbar + filename visible) |
 
 ## Guidelines
 
