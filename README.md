@@ -10,8 +10,15 @@
 </p>
 
 <p align="center">
-  <strong>Community edition</strong> — fully client-side, no login, no server upload.<br/>
+  <a href="https://wanderzil.github.io/vehicle-log-viewer/"><strong>Live demo</strong></a>
+  ·
   <a href="./docs/guide.md">User guide</a>
+  ·
+  <a href="./docs/architecture.md">Architecture</a>
+</p>
+
+<p align="center">
+  <strong>Community edition</strong> — fully client-side, no login, no server upload.
 </p>
 
 ---
