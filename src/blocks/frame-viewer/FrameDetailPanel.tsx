@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import type { DecodedSignalValue, RawFrameRow } from '@/modules/analyses/types';
 
 import { TRACE, channelBadgeClass } from './trace-colors';
+import { FrameBitHeatmap } from './FrameBitHeatmap';
 
 function formatTraceTime(us: number) {
   const totalMs = Math.max(0, Math.floor(us / 1000));
@@ -63,9 +64,11 @@ function MetaRow({
 export function FrameDetailPanel({
   row,
   decoded,
+  messageFrames,
 }: {
   row: RawFrameRow | null;
   decoded: { messageName: string; signals: DecodedSignalValue[] } | null;
+  messageFrames: RawFrameRow[];
 }) {
   if (!row) {
     return (
@@ -310,6 +313,12 @@ export function FrameDetailPanel({
               />
             )}
           </dl>
+        </section>
+
+        <Separator className="my-3" />
+
+        <section>
+          <FrameBitHeatmap frames={messageFrames} currentFrame={row} />
         </section>
 
         <Separator className="my-3" />

@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { FrameDetailPanel } from '@/blocks/frame-viewer/FrameDetailPanel';
 import { FrameFilterButton } from '@/blocks/frame-viewer/frame-filter-button';
 import { FrameTable } from '@/blocks/frame-viewer/FrameTable';
+import { buildMessageSparklines } from '@/blocks/frame-viewer/frame-sparkline';
 import {
   applyFrameFilters,
   buildSearchMatches,
@@ -76,6 +77,20 @@ export function FrameViewer() {
 
   const selectedRow =
     filteredRows.find((row) => row.rowId === selectedRowId) ?? filteredRows[0] ?? null;
+
+  const messageSparklines = useMemo(
+    () => buildMessageSparklines(snap.rawFrames),
+    [snap.rawFrames]
+  );
+
+  const selectedMessageFrames = useMemo(() => {
+    if (!selectedRow) return [];
+    return snap.rawFrames.filter(
+      (f) =>
+        f.channel === selectedRow.channel &&
+        f.arbitrationId === selectedRow.arbitrationId
+    );
+  }, [snap.rawFrames, selectedRow]);
 
   useEffect(() => {
     if (!selectedRow) {
@@ -302,13 +317,18 @@ export function FrameViewer() {
       <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(320px,380px)]">
         <FrameTable
           rows={filteredRows}
+          sparklines={messageSparklines}
           selectedRowId={selectedRow?.rowId ?? null}
           onSelect={onSelect}
           timeDesc={timeDesc}
           onToggleTimeSort={() => setTimeDesc((v) => !v)}
           scrollToRowId={scrollToRowId}
         />
-        <FrameDetailPanel row={selectedRow} decoded={decoded} />
+        <FrameDetailPanel
+          row={selectedRow}
+          decoded={decoded}
+          messageFrames={selectedMessageFrames}
+        />
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import {
   AnalyzeWorkspaceToolbar,
   type AnalyzeTab,
 } from '@/blocks/analyze-workspace-toolbar';
+import { DbcViewer } from '@/blocks/dbc-viewer';
 import { FrameViewer } from '@/blocks/frame-viewer';
 import { SignalViewer } from '@/blocks/signal-viewer';
 import { useClientAnalysisSession } from '@/hooks/use-client-analysis-session';
@@ -135,6 +136,9 @@ function AnalyzePage() {
         <div className={activeTab === 'trace' ? 'h-full' : 'hidden'} aria-hidden={activeTab !== 'trace'}>
           <FrameViewer />
         </div>
+        <div className={activeTab === 'dbc' ? 'h-full' : 'hidden'} aria-hidden={activeTab !== 'dbc'}>
+          <DbcViewer />
+        </div>
       </div>
     </div>
   );
@@ -145,7 +149,10 @@ export const Route = createFileRoute('/')({
     fresh: search.fresh === '1' || search.fresh === 1 ? '1' : undefined,
     parsed: search.parsed === '1' || search.parsed === 1 ? '1' : undefined,
     count: typeof search.count === 'string' ? search.count : undefined,
-    tab: search.tab === 'trace' ? 'trace' : 'graph',
+    tab:
+      search.tab === 'trace' || search.tab === 'dbc' || search.tab === 'graph'
+        ? search.tab
+        : 'graph',
   }),
   component: AnalyzePage,
 });

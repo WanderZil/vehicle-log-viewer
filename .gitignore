@@ -9,14 +9,10 @@ venv/
 # Build / tooling
 .output/
 .tanstack/
-.wrangler/
+.nitro/
 dist/
 .vite/
 *.local
-
-# Cloudflare working copy (template is wrangler.example.jsonc)
-wrangler.jsonc
-wrangler.toml
 
 # Local data & runtime artifacts
 data/

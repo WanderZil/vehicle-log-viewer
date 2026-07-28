@@ -1,0 +1,34 @@
+VERSION "Vehicle Log Viewer demo (synthetic J1939-style)"
+
+NS_ :
+BS_:
+BU_: Engine Gateway Dash
+
+BO_ 217056256 EEC1: 8 Engine
+ SG_ EngineSpeed : 24|16@1+ (0.125,0) [0|8031.875] "rpm" Gateway,Dash
+ SG_ ActualEnginePercentTorque : 16|8@1+ (1,-125) [-125|125] "%" Gateway
+
+BO_ 217056000 EEC2: 8 Engine
+ SG_ AcceleratorPedalPosition1 : 8|8@1+ (0.4,0) [0|100] "%" Gateway,Dash
+ SG_ EnginePercentLoadAtCurrentSpeed : 16|8@1+ (1,0) [0|125] "%" Gateway
+
+BO_ 419361024 CCVS1: 8 Gateway
+ SG_ WheelBasedVehicleSpeed : 8|16@1+ (0.00390625,0) [0|250.996] "km/h" Dash
+ SG_ BrakeSwitch : 28|2@1+ (1,0) [0|3] "" Dash
+ SG_ CruiseControlActive : 30|2@1+ (1,0) [0|3] "" Dash
+
+CM_ BO_ 217056256 "Electronic Engine Controller 1";
+CM_ SG_ 217056256 EngineSpeed "Engine speed";
+CM_ BO_ 217056000 "Electronic Engine Controller 2";
+CM_ BO_ 419361024 "Cruise Control / Vehicle Speed 1";
+BA_DEF_ BO_  "VFrameFormat" ENUM  "StandardCAN","ExtendedCAN","reserved","J1939PG";
+BA_DEF_  "BusType" STRING ;
+BA_DEF_  "ProtocolType" STRING ;
+BA_DEF_DEF_  "VFrameFormat" "J1939PG";
+BA_DEF_DEF_  "BusType" "CAN";
+BA_DEF_DEF_  "ProtocolType" "J1939";
+BA_ "ProtocolType" "J1939";
+BA_ "BusType" "CAN";
+BA_ "VFrameFormat" BO_ 217056256 3;
+BA_ "VFrameFormat" BO_ 217056000 3;
+BA_ "VFrameFormat" BO_ 419361024 3;

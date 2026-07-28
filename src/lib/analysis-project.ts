@@ -7,7 +7,7 @@ export const PROJECT_FILE_SUFFIX = '.blfproject.json';
 
 export type ProjectViewMode = 'overlay' | 'stacked';
 export type ProjectZoomMode = 'cursor' | 'box' | 'x' | 'y' | 'pan';
-export type ProjectAnalyzeTab = 'graph' | 'trace';
+export type ProjectAnalyzeTab = 'graph' | 'trace' | 'dbc';
 
 export type ProjectYRange = { min: number; max: number };
 export type ProjectViewWindow = { tMin: number; tMax: number };
@@ -224,7 +224,7 @@ export function parseAnalysisProjectFile(raw: unknown): AnalysisProjectFile {
   }
 
   const tab = viewer.tab;
-  if (tab !== 'graph' && tab !== 'trace') throw new Error('Invalid viewer tab');
+  if (tab !== 'graph' && tab !== 'trace' && tab !== 'dbc') throw new Error('Invalid viewer tab');
 
   return raw as AnalysisProjectFile;
 }

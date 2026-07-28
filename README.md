@@ -1,18 +1,63 @@
 # Vehicle Log Viewer
 
-Open-source, browser-based CAN log analyzer. Upload a log file and DBC, map channels, parse in the browser, then explore signals on **Graph** or raw frames on **Trace**.
+<p align="center">
+  <img src="./public/logo.svg" alt="Vehicle Log Viewer" width="80" height="80" />
+</p>
 
-This repository is the **community edition** — fully client-side, no login, no server-side parsing.
+<p align="center">
+  Open-source, browser-based CAN log analyzer.<br/>
+  Load BLF / ASC / CSV / MF4 and DBC, decode in the browser, then explore on <strong>Graph</strong>, <strong>Trace</strong>, or <strong>DBC</strong>.
+</p>
 
-For the commercial hosted edition with additional features, see the link in the app toolbar or visit your production URL configured via `VITE_COMMERCIAL_URL`.
+<p align="center">
+  <strong>Community edition</strong> — fully client-side, no login, no server upload.<br/>
+  <a href="./docs/guide.md">User guide</a>
+</p>
+
+---
+
+## Screenshots
+
+> Screenshots live under [`docs/samples/`](./docs/samples/) (`graph.png`, `Trace.png`, `DBC.png`).
+
+| Graph | Trace | DBC |
+|:-----:|:-----:|:---:|
+| ![Graph view](./docs/samples/graph.png) | ![Trace view](./docs/samples/Trace.png) | ![DBC view](./docs/samples/DBC.png) |
+| Signal charts, cursors, groups | Frame table, decode, bit heatmap | Messages, bit layout, attributes |
+
+---
 
 ## Features
 
-- **Graph** — time-series charts, signal groups, zoom/pan, cursors, project save/load
-- **Trace** — searchable CAN frame table with detail panel
-- **Formats** — BLF, ASC, CSV, MF4 (client-side parsing, no server upload)
+- **Graph** — time-series charts, signal search, zoom/pan, main & diff cursors, project save/load
+- **Trace** — searchable CAN frame table, filters, decoded detail panel, bit activity heatmap
+- **DBC** — browse messages, signals, nodes, enums, and bit layout without a log file
+- **Formats** — BLF, ASC, CSV, MF4 (client-side parsing)
 - **Export** — CSV export for loaded or all parsed signals
 - **Project files** — save and restore workspace layout (`.blfproject.json`)
+- **i18n** — English and Chinese UI
+
+---
+
+## Architecture
+
+Vehicle Log Viewer is a **static client-side application**:
+
+- **UI layer** — React 19 + TanStack Router + TanStack Query
+- **Parsing layer** — browser-side BLF / ASC / CSV / MF4 readers in `src/lib/can/`
+- **Decode layer** — DBC loading, channel mapping, signal decode, trace row annotation
+- **Workspace layer** — one in-memory `ClientAnalysisSession` shared by Graph / Trace / DBC
+- **Persistence layer** — `.blfproject.json` export/import for layout and mapping state
+
+The three main views all read from the same local analysis session:
+
+- **Graph** focuses on decoded signal time-series analysis
+- **Trace** focuses on raw frame inspection plus per-row signal decode
+- **DBC** focuses on browsing the database itself
+
+Implementation details: [docs/architecture.md](./docs/architecture.md)
+
+---
 
 ## Quick start
 
@@ -24,29 +69,69 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## Usage
+### Typical workflow
 
-1. **File → Load log** — BLF / ASC / CSV / MF4
-2. **File → Load DBC** — one or more DBC files
-3. **File → Channels** — assign DBCs to CAN channels
-4. **File → Parse** — decode signals in the browser
-5. Switch **View → Graph** or **Trace**
-6. Optional: **File → Export CSV** or save/import a project
+1. **File → Load CAN log…**
+2. **File → Load DBC…**
+3. **File → Channel mapping…**
+4. **File → Parse signals**
+5. **View → Graph** / **Trace** / **DBC**
 
-## Deploy (Cloudflare Workers)
+Details: [docs/guide.md](./docs/guide.md)
+
+### Local deployment / preview
 
 ```bash
-cp wrangler.example.jsonc wrangler.jsonc
-# Edit wrangler.jsonc (production URL)
-cp .env.example .env.production
-pnpm cf:deploy
+pnpm build
+pnpm preview
 ```
 
-This edition serves a static client-side app — no database required.
+### GitHub Pages build
 
-## Third-party notices
+```bash
+VITE_BASE_PATH=/your-repo-name/ pnpm build:pages
+```
 
-See [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
+The app is distributed as a static SPA. No database or backend service is required for the community edition.
+
+---
+
+## Deploy (GitHub Pages)
+
+Static SPA — no server or database. CI workflow: [`.github/workflows/pages.yml`](./.github/workflows/pages.yml).
+
+1. Push to `main` (or `clean-main`)
+2. Repo **Settings → Pages → Source**: GitHub Actions
+3. Optional repo **Variables**: `VITE_BASE_PATH`, `VITE_APP_URL`, `VITE_COMMERCIAL_URL`
+
+Local static build:
+
+```bash
+VITE_BASE_PATH=/your-repo-name/ pnpm build:pages
+# Output: .output/public (includes 404.html SPA fallback)
+```
+
+Optional env:
+
+| Variable | Purpose |
+|----------|---------|
+| `VITE_BASE_PATH` | Asset/router base (`/` or `/repo-name/`) |
+| `VITE_APP_URL` | Public site URL |
+| `VITE_APP_NAME` | App title |
+| `VITE_COMMERCIAL_URL` | Link to hosted Pro edition (optional) |
+
+---
+
+## Documentation
+
+| Doc | Description |
+|-----|-------------|
+| [docs/guide.md](./docs/guide.md) | Detailed Graph, Trace, DBC user guide |
+| [docs/architecture.md](./docs/architecture.md) | Implementation architecture and data flow |
+| [docs/screenshots/](./docs/screenshots/) | Screenshot assets for README |
+| [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md) | Dependency licenses |
+
+---
 
 ## License
 

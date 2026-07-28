@@ -532,7 +532,8 @@ function frameFromRecord(
 
   let channel = 1;
   if (plan.busChannel) {
-    const ch = decodeRaw(record, plan.busChannel);
+    // BusChannel is often float64 in CANedge MF4; use physical decode.
+    const ch = Math.round(decodePhysical(record, plan.busChannel));
     channel = ch >= 1 ? ch : ch + 1;
   }
 

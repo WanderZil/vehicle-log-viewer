@@ -13,7 +13,9 @@ export const envConfigs = {
     return metaEnv.VITE_APP_DESCRIPTION ?? 'Browser-based CAN log viewer';
   },
   get app_logo() {
-    return metaEnv.VITE_APP_LOGO ?? '/logo.svg';
+    if (metaEnv.VITE_APP_LOGO) return metaEnv.VITE_APP_LOGO;
+    const base = metaEnv.BASE_URL || '/';
+    return `${base}logo.svg`.replace(/\/{2,}/g, '/');
   },
   get commercial_url() {
     return metaEnv.VITE_COMMERCIAL_URL ?? '';

@@ -207,6 +207,15 @@ function patchMessageDlcsFromSource(data: DbcData, source: string) {
   }
 }
 
+export function formatCycleTimeMs(ms: number | null | undefined): string {
+  if (ms == null || !Number.isFinite(ms)) return '-';
+  if (ms >= 1000) {
+    const sec = ms / 1000;
+    return Number.isInteger(sec) ? `${sec} s` : `${sec.toFixed(3).replace(/\.?0+$/, '')} s`;
+  }
+  return Number.isInteger(ms) ? `${ms} ms` : `${ms.toFixed(3).replace(/\.?0+$/, '')} ms`;
+}
+
 export function loadDbcText(text: string): DbcData {
   const normalized = normalizeDbcScientificNotation(text);
   const dbc = new Dbc();
@@ -534,10 +543,11 @@ export async function extractRawFramesFromLog(params: {
   const yieldEvery = 8_000;
   const totalBytes = Math.max(1, params.buffer.byteLength);
   const counts = new Map<number, number>();
-  const rawFrames: RawFrameRow[] = [];
+  // Keep absolute timestamps first — MF4 bus-logging groups are not globally
+  // time-ordered, so the first yielded frame is not always the earliest.
+  const pending: CanFrame[] = [];
   let messageCount = 0;
   let truncated = false;
-  let t0: number | null = null;
   let lastProgressEmit = 0;
 
   params.onProgress?.(0.02);
@@ -546,14 +556,8 @@ export async function extractRawFramesFromLog(params: {
     messageCount += 1;
     counts.set(frame.channel, (counts.get(frame.channel) ?? 0) + 1);
 
-    if (rawFrames.length < CLIENT_MAX_RAW_FRAME_ROWS) {
-      if (t0 === null) t0 = frame.timestamp;
-      rawFrames.push(
-        frameToRawRow(frame, rawFrames.length, t0, {
-          messageName: null,
-          nodeName: null,
-        })
-      );
+    if (pending.length < CLIENT_MAX_RAW_FRAME_ROWS) {
+      pending.push(frame);
     } else {
       truncated = true;
     }
@@ -567,6 +571,17 @@ export async function extractRawFramesFromLog(params: {
       await yieldToBrowser();
     }
   }
+
+  let t0 = pending[0]?.timestamp ?? 0;
+  for (const frame of pending) {
+    if (frame.timestamp < t0) t0 = frame.timestamp;
+  }
+  const rawFrames = pending.map((frame, rowId) =>
+    frameToRawRow(frame, rowId, t0, {
+      messageName: null,
+      nodeName: null,
+    })
+  );
 
   params.onProgress?.(1);
 
@@ -652,13 +667,18 @@ export async function decodeLogWithDbcs(params: {
   const signalsMeta = new Map<string, CachedSignalMeta>();
   const signalPoints = new Map<string, Array<[number, number]>>();
   const diagnostics: DiagnosticFrame[] = [];
-  const rawFrames: RawFrameRow[] = [];
+  const pendingRaw: CanFrame[] = [];
+  const pendingRawNames: Array<{
+    messageName: string | null;
+    nodeName: string | null;
+  }> = [];
   let messageCount = 0;
   let decodedMessages = 0;
   let t0: number | null = null;
-  let t0Raw: number | null = null;
   let durationUs = 0;
   let seen = 0;
+  // Absolute-time points first — MF4 channel groups are not globally ordered.
+  const pendingPoints: Array<{ sid: string; absTs: number; value: number }> = [];
 
   params.onProgress?.(0.02);
 
@@ -689,8 +709,7 @@ export async function decodeLogWithDbcs(params: {
         data: frame.data,
       });
     }
-    if (includeRawFrames && rawFrames.length < CLIENT_MAX_RAW_FRAME_ROWS) {
-      if (t0Raw === null) t0Raw = frame.timestamp;
+    if (includeRawFrames && pendingRaw.length < CLIENT_MAX_RAW_FRAME_ROWS) {
       const names = lookupMessageName(
         channelDbs,
         frame.channel,
@@ -699,7 +718,8 @@ export async function decodeLogWithDbcs(params: {
         frame.isRemote,
         Boolean(frame.isError)
       );
-      rawFrames.push(frameToRawRow(frame, rawFrames.length, t0Raw, names));
+      pendingRaw.push(frame);
+      pendingRawNames.push(names);
     }
 
     const dbs = channelDbs.get(frame.channel);
@@ -720,9 +740,7 @@ export async function decodeLogWithDbcs(params: {
     if (!values || !message) continue;
 
     messageCount += 1;
-    if (t0 === null) t0 = frame.timestamp;
-    const relUs = Math.round((frame.timestamp - t0) * 1_000_000);
-    if (relUs > durationUs) durationUs = relUs;
+    if (t0 === null || frame.timestamp < t0) t0 = frame.timestamp;
     decodedMessages += 1;
 
     for (const [sigName, val] of values.entries()) {
@@ -742,11 +760,30 @@ export async function decodeLogWithDbcs(params: {
         signalsMeta.set(sid, entry);
         signalPoints.set(sid, []);
       }
-      signalPoints.get(sid)!.push([relUs, Math.round(val * 1e6) / 1e6]);
+      pendingPoints.push({
+        sid,
+        absTs: frame.timestamp,
+        value: Math.round(val * 1e6) / 1e6,
+      });
       const meta = signalsMeta.get(sid)!;
       meta.pointCount += 1;
     }
   }
+
+  const baseTs = t0 ?? 0;
+  for (const pt of pendingPoints) {
+    const relUs = Math.round((pt.absTs - baseTs) * 1_000_000);
+    if (relUs > durationUs) durationUs = relUs;
+    signalPoints.get(pt.sid)!.push([relUs, pt.value]);
+  }
+
+  let t0Raw = pendingRaw[0]?.timestamp ?? baseTs;
+  for (const frame of pendingRaw) {
+    if (frame.timestamp < t0Raw) t0Raw = frame.timestamp;
+  }
+  const rawFrames = pendingRaw.map((frame, rowId) =>
+    frameToRawRow(frame, rowId, t0Raw, pendingRawNames[rowId]!)
+  );
 
   params.onProgress?.(0.97);
   await yieldToBrowser();

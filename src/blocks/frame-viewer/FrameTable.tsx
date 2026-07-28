@@ -9,14 +9,17 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty';
 import { cn } from '@/lib/utils';
+import { m } from '@/paraglide/messages.js';
 import type { RawFrameRow } from '@/modules/analyses/types';
 
+import { FrameSparkline } from './FrameSparkline';
+import { messageSparkKey, type SparklineSeries } from './frame-sparkline';
 import { TRACE, channelTone } from './trace-colors';
 
 const ROW_H = 32;
 const OVERSCAN = 12;
 const GRID_TEMPLATE =
-  '44px minmax(124px,0.86fr) 72px 48px 84px minmax(88px,0.9fr) 44px 36px minmax(160px,1.28fr)';
+  '44px minmax(124px,0.86fr) 72px 48px 84px minmax(88px,0.9fr) 56px 44px 36px minmax(160px,1.28fr)';
 const GRID_CLASS = 'grid items-center gap-x-2 px-3';
 
 function formatTraceTime(us: number) {
@@ -44,6 +47,7 @@ function DirChip({ dir }: { dir: 'Rx' | 'Tx' }) {
 
 export function FrameTable({
   rows,
+  sparklines,
   selectedRowId,
   onSelect,
   timeDesc,
@@ -51,6 +55,7 @@ export function FrameTable({
   scrollToRowId,
 }: {
   rows: RawFrameRow[];
+  sparklines: Map<string, SparklineSeries>;
   selectedRowId: number | null;
   onSelect: (row: RawFrameRow) => void;
   timeDesc: boolean;
@@ -122,6 +127,7 @@ export function FrameTable({
         <div>Ch</div>
         <div>ID</div>
         <div>Frame</div>
+        <div>{m['analyses.frame_sparkline']()}</div>
         <div>Dir</div>
         <div>DLC</div>
         <div>Data</div>
@@ -186,6 +192,13 @@ export function FrameTable({
                     </div>
                     <div className={cn('truncate text-[11px] font-medium', TRACE.frame)}>
                       {row.messageName ?? '-'}
+                    </div>
+                    <div className="flex items-center justify-center">
+                      <FrameSparkline
+                        series={sparklines.get(
+                          messageSparkKey(row.channel, row.arbitrationId)
+                        )}
+                      />
                     </div>
                     <div>
                       <DirChip dir={row.dir} />

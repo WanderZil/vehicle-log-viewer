@@ -28,7 +28,7 @@ This project uses the following open-source libraries. Each library is subject t
 |---------|---------|---------|
 | TypeScript | Apache-2.0 | Type checking |
 | Prettier | MIT | Code formatting |
-| Wrangler | MIT | Cloudflare Workers deploy |
+| Vite / Nitro | MIT | Build tooling |
 
 For the full dependency tree and exact license texts, run:
 

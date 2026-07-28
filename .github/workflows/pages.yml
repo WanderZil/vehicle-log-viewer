@@ -1,0 +1,51 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main, clean-main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build static site
+        run: pnpm build:pages
+        env:
+          # Override with repo Variables for a custom domain or user/*.github.io root site.
+          VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH != '' && vars.VITE_BASE_PATH || format('/{0}/', github.event.repository.name) }}
+          VITE_APP_URL: ${{ vars.VITE_APP_URL != '' && vars.VITE_APP_URL || format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}
+          VITE_APP_NAME: Vehicle Log Viewer
+          VITE_COMMERCIAL_URL: ${{ vars.VITE_COMMERCIAL_URL }}
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .output/public
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

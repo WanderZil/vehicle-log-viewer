@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link } from '@tanstack/react-router';
-import { ChevronDown, Eye, LineChart, ListTree } from 'lucide-react';
+import { ChevronDown, Database, Eye, LineChart, ListTree } from 'lucide-react';
 
 import { AnalysisToolbar } from '@/blocks/signal-viewer/analysis-toolbar';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -13,8 +13,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { envConfigs } from '@/config';
+import { m } from '@/paraglide/messages.js';
 
-export type AnalyzeTab = 'graph' | 'trace';
+export type AnalyzeTab = 'graph' | 'trace' | 'dbc';
 
 export function AnalyzeWorkspaceToolbar({
   analysisId,
@@ -57,11 +58,13 @@ export function AnalyzeWorkspaceToolbar({
             View
             <ChevronDown className="text-muted-foreground size-3 opacity-70" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-40">
+          <DropdownMenuContent align="start" className="w-44">
             <DropdownMenuRadioGroup
               value={activeTab}
               onValueChange={(value) => {
-                if (value === 'graph' || value === 'trace') onTabChange(value);
+                if (value === 'graph' || value === 'trace' || value === 'dbc') {
+                  onTabChange(value);
+                }
               }}
             >
               <DropdownMenuRadioItem value="graph" className="gap-2">
@@ -71,6 +74,10 @@ export function AnalyzeWorkspaceToolbar({
               <DropdownMenuRadioItem value="trace" className="gap-2">
                 <ListTree className="size-3.5" />
                 Trace
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="dbc" className="gap-2">
+                <Database className="size-3.5" />
+                {m['analyses.view_dbc']()}
               </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>

@@ -7,9 +7,8 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
-    "start": "node .output/server/index.mjs",
-    "cf:build": "NITRO_PRESET=cloudflare_module vite build",
-    "cf:deploy": "sh -c 'set -a && [ -f .env.production ] && . ./.env.production; set +a && pnpm cf:build && exec wrangler deploy'",
+    "build:pages": "vite build && node scripts/prepare-pages.mjs",
+    "preview": "vite preview",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -56,8 +55,7 @@
     "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.9.0",
-    "vite": "^8.0.16",
-    "wrangler": "^4.98.0"
+    "vite": "^8.0.16"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
